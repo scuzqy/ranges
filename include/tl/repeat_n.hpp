@@ -15,7 +15,7 @@ namespace tl {
       : public std::ranges::view_interface<repeat_n_view<T>> {
    private:
       tl::semiregular_box<T> value_;
-      std::size_t n_;
+      std::ptrdiff_t n_;
 
       class cursor {
          T const* value_;
@@ -25,7 +25,7 @@ namespace tl {
          static constexpr bool single_pass = false;
 
          cursor() = default;
-         constexpr explicit cursor(T const* value, std::size_t pos)
+         constexpr explicit cursor(T const* value, std::ptrdiff_t pos)
             : value_{ value }, pos_( pos ){}
 
          constexpr decltype(auto) read() const {
@@ -62,7 +62,7 @@ namespace tl {
 
    public:
       repeat_n_view() = default;
-      repeat_n_view(T t, std::size_t n) : value_(std::move(t)), n_(n) {}
+      repeat_n_view(T t, std::ptrdiff_t n) : value_(std::move(t)), n_(n) {}
 
       constexpr auto begin() const {
          return basic_iterator{ cursor(std::addressof(value_.value()), n_) };
@@ -74,7 +74,7 @@ namespace tl {
    };
 
    template <class T>
-   repeat_n_view(T&&, std::size_t)->repeat_n_view<T>;
+   repeat_n_view(T&&, std::ptrdiff_t)->repeat_n_view<T>;
 
    namespace views {
       namespace detail {
@@ -82,7 +82,7 @@ namespace tl {
          public:
              template <class T>
                  requires std::copyable<std::remove_cvref_t<T>>
-            constexpr auto operator()(T&& v, std::size_t n) const {
+            constexpr auto operator()(T&& v, std::ptrdiff_t n) const {
                return tl::repeat_n_view{ std::forward<T>(v), n };
             }
          };
